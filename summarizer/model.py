@@ -28,17 +28,29 @@ STYLE_CONFIG = {
 }
 
 # -----------------------------
-# Text chunking (for long input)
+# TOKEN-AWARE CHUNKING
 # -----------------------------
-def split_text(text, max_words=350):
-    words = text.split()
-    return [
-        " ".join(words[i:i + max_words])
-        for i in range(0, len(words), max_words)
-    ]
+def split_text(text, style="medium", max_tokens=480):
+
+    prompt = STYLE_CONFIG[style]["prompt"]
+    prompt_tokens = len(tokenizer.encode(prompt))
+
+    safe_chunk_size = max_tokens - prompt_tokens
+
+    token_ids = tokenizer.encode(text)
+
+    chunks = []
+
+    for i in range(0, len(token_ids), safe_chunk_size):
+        chunk_ids = token_ids[i:i + safe_chunk_size]
+        chunk_text = tokenizer.decode(chunk_ids, skip_special_tokens=True)
+        chunks.append(chunk_text)
+
+    return chunks
+
 
 # -----------------------------
-# Core summarization (NO chunking)
+# Core summarization
 # -----------------------------
 def summarize_batch(
     texts,
@@ -46,8 +58,9 @@ def summarize_batch(
     temperature=0.7,
     num_beams=4
 ):
+
     if style not in STYLE_CONFIG:
-        raise ValueError("style must be 'short' or 'medium'")
+        raise ValueError("Invalid style")
 
     config = STYLE_CONFIG[style]
 
@@ -77,8 +90,9 @@ def summarize_batch(
         for o in outputs
     ]
 
+
 # -----------------------------
-# Long-text summarization (WITH chunking)
+# LONG TEXT SUMMARIZATION
 # -----------------------------
 def summarize_long_text(
     text,
@@ -86,18 +100,11 @@ def summarize_long_text(
     temperature=0.7,
     num_beams=4
 ):
-    chunks = split_text(text)
 
-    # 1 chunk → normal summary
-    if len(chunks) == 1:
-        return summarize_batch(
-            [chunks[0]],
-            style=style,
-            temperature=temperature,
-            num_beams=num_beams
-        )[0]
+    # Step 1: Chunk input safely
+    chunks = split_text(text, style=style)
 
-    # Summarize each chunk
+    # Step 2: Summarize chunks
     chunk_summaries = summarize_batch(
         chunks,
         style=style,
@@ -105,14 +112,32 @@ def summarize_long_text(
         num_beams=num_beams
     )
 
-    # Meta-summary
-    combined = " ".join(chunk_summaries)
+    if len(chunk_summaries) == 1:
+        return chunk_summaries[0]
 
-    final_summary = summarize_batch(
+    # Step 3: Label chunks for diversity
+    labeled_summaries = [
+        f"Section {i+1}: {s}"
+        for i, s in enumerate(chunk_summaries)
+    ]
+
+    combined = "\n\n".join(labeled_summaries)
+
+    # Step 4: Check token size again
+    combined_tokens = len(tokenizer.encode(combined))
+
+    if combined_tokens > 480:
+        return summarize_long_text(
+            combined,
+            style=style,
+            temperature=temperature,
+            num_beams=num_beams
+        )
+
+    # Step 5: Final summarization
+    return summarize_batch(
         [combined],
         style=style,
         temperature=temperature,
         num_beams=num_beams
     )[0]
-
-    return final_summary

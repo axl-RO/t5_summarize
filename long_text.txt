@@ -1,0 +1,59 @@
+Research on deepfake detection from 2020 to 2025 has
+focused on improving accuracy, efficiency, and interpretability
+using deep learning methods. The most common frameworks
+are Convolutional Neural Networks (CNNs), which are key
+because of their ability to extract spatial features. Studies by
+Ikram et al. (2023) and Motloch et al. (2022) enhanced CNNbased
+detection by refining preprocessing and input representation.
+Their methods focused on detecting subtle facial artifacts,
+such as blending edges, texture inconsistencies, and lighting
+mismatches, using lightweight CNN architectures that maintain
+both efficiency and accuracy. Similarly, Charitidis et al.
+(2020) explored how preprocessing and prediction aggregation
+affect detection performance. They found that preprocessing is
+essential for improving generalization across different datasets.
+In addition to conventional CNNs, several studies have
+looked into hybrid architectures that blend CNNs with Vision
+Transformers (ViTs) to capture both local and global features.
+Soudy et al. (2024) proposed a Convolutional Vision Transformer
+(CViT) where CNN layers extract localized manipulation
+traces while ViTs capture broader contextual relationships
+across facial regions. Similar research by Ikram et al. (2023)
+and others indicated that combining transformer-based attention
+mechanisms with CNN feature maps improves robustness
+and accuracy on benchmark datasets like FaceForensics++ and
+DFDC. Although these hybrid models achieved nearly stateof-
+the-art accuracy (around 97(%)), their high computational
+requirements make them less practical for real-time use or
+systems with limited resources.
+Another research area focuses on efficient detection using
+Binary Neural Networks (BNNs) and model quantization. Lanzino et al. (2024) introduced a BNN method that binarizes
+weights and activations, significantly lowering computational
+costs and memory use. Despite slight accuracy declines, this
+design enables real-time inference on embedded or mobile
+devices, which is crucial for large-scale or low-power applications.
+Likewise, Venkatesh and S. (2022) noted that optimizing
+model size can support practical deployment without compromising
+generalization.
+Alongside performance and efficiency, recent studies have
+increasingly targeted interpretability and transparency. Explainable
+AI (XAI) frameworks developed by Deep Kaur and
+Hoshyar (2024) and others use saliency maps, Grad-CAM
+visualizations, and heatmaps to highlight manipulated areas
+in an image. These visual explanations foster user trust and
+provide forensic analysts with insights into model reasoning.
+However, these explainable models often introduce additional
+computational overhead and complexity, slightly impacting
+inference speed.
+Overall, the reviewed studies suggest a common trade-off
+between accuracy, efficiency, and interpretability. CNN-based
+systems remain dominant due to their simplicity and effectiveness
+in detecting local features, while hybrid CNN-ViT
+architectures achieve better accuracy at a higher computational
+cost. Efficiency-focused models like BNNs allow for practical
+real-time use, and XAI methods enhance transparency for
+forensic validation. Building on these trends, our research uses
+a lightweight CNN (Meso4) architecture combined with an
+optimized preprocessing pipeline to find a balanced solution
+that ensures competitive accuracy, fast inference, and strong
+generalization.
