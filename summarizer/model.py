@@ -82,8 +82,11 @@ def summarize_batch(
             min_length=config["min_length"],
             num_beams=num_beams,
             length_penalty=config["length_penalty"],
+            no_repeat_ngram_size=3,
+            repetition_penalty=1.5,
             early_stopping=True
         )
+
 
     return [
         tokenizer.decode(o, skip_special_tokens=True)
